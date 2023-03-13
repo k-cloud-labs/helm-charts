@@ -1,6 +1,6 @@
 apiVersion: v2
 name: kinitiras
-description: A lightweight but powerful and programmable rule engine for kubernetes admission webhook.
+description: A lightweight but powerful and programmable rule engine for kubernetes admission webhook powered by k-cloud-labs.
 
 # A chart can be either an 'application' or a 'library' chart.
 #
