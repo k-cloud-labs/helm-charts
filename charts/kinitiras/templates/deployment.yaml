@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "kinitiras-webhook.fullname" . }}
+  labels:
+    {{- include "kinitiras-webhook.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "kinitiras-webhook.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "kinitiras-webhook.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "kinitiras-webhook.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          command:
+            - ./webhook
+          args:
+            - --cert-dir=/certs
+            - --v=2
+            - --logtostderr=false
+            - --alsologtostderr=true
+            - --log_dir=./log
+            - --secure-port={{.Values.service.port}}
+            - --metrics-bind-address=:{{ .Values.metrics.port }}
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+            - name: NAMESPACE
+              value: {{ .Release.Namespace }}
+            - name: SECRET
+              value: {{ include "kinitiras-webhook.fullname" . }}
+            - name: SERVICE_NAME
+              value: {{ include "kinitiras-webhook.fullname" . }}
+            - name: MUTATING_CONFIG
+              value: {{ include "kinitiras-webhook.fullname" . }}
+            - name: VALIDATING_CONFIG
+              value: {{ include "kinitiras-webhook.fullname" . }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.readinessProbe.enabled }}
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe.probe | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - mountPath: /certs
+              name: cert
+              readOnly: true
+            - mountPath: /kinitiras/log
+              name: log
+              subPathExpr: $(POD_NAME)
+      volumes:
+        - name: cert
+          secret:
+            secretName: {{ include "kinitiras-webhook.fullname" . }}
+        - name: log
+          hostPath:
+            path: /var/log/kinitiras
+            type: DirectoryOrCreate
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.affinity }}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    {{- tpl .Values.affinity . }}
+                topologyKey: kubernetes.io/hostname
+              weight: 10
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

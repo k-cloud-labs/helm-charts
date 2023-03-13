@@ -1,0 +1,28 @@
+{{- if .Values.mutatingWebhookConfiguration.create -}}
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: {{ include "kinitiras-webhook.fullname" . }}
+webhooks:
+  {{- $ns := .Release.Namespace }}
+  {{- $name := include "kinitiras-webhook.fullname" . }}
+  {{- $port := .Values.service.port }}
+  {{- range .Values.mutatingWebhookConfiguration.admissionReviewVersions }}
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: {{ $name }}
+        namespace: {{ $ns }}
+        path: /mutate
+        port: {{ $port }}
+    failurePolicy: Ignore
+    name: {{ .name }}
+    objectSelector:
+      {{- toYaml .objectSelector | nindent 6 }}
+    rules:
+      {{- toYaml .rules | nindent 6 }}
+    sideEffects: None
+    timeoutSeconds: 3
+  {{- end }}
+{{end}}
