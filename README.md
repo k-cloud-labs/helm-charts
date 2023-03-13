@@ -1,3 +1,3 @@
 # Helm Charts
 
-Helm Charts repo for `k-cloud-labs`.
+Official **Helm Charts** repo for `k-cloud-labs`.
