@@ -2,6 +2,17 @@ apiVersion: v1
 entries:
   kinitiras:
   - apiVersion: v2
+    appVersion: v0.2.4
+    created: "2023-03-15T02:52:41.457383172Z"
+    description: A lightweight but powerful and programmable rule engine for kubernetes
+      admission webhook powered by k-cloud-labs.
+    digest: 8b6126939f4129aa26f18d0b18698ccb186ac620c9497e5db718570924dfe253
+    name: kinitiras
+    type: application
+    urls:
+    - https://github.com/k-cloud-labs/helm-charts/releases/download/kinitiras-0.2.4/kinitiras-0.2.4.tgz
+    version: 0.2.4
+  - apiVersion: v2
     appVersion: 0.2.3
     created: "2023-03-13T07:56:39.445733326Z"
     description: A lightweight but powerful and programmable rule engine for kubernetes
@@ -12,4 +23,4 @@ entries:
     urls:
     - https://github.com/k-cloud-labs/helm-charts/releases/download/kinitiras-0.2.3/kinitiras-0.2.3.tgz
     version: 0.2.3
-generated: "2023-03-13T07:56:39.445742526Z"
+generated: "2023-03-15T02:52:41.457405872Z"
