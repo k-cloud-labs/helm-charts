@@ -17,7 +17,7 @@ k-cloud-labs` to see the charts.
 
 To install the <chart-name> chart:
 
-    helm install my-kinitiras k-cloud-labs/kinitiras
+    helm install kinitiras-webhook k-cloud-labs/kinitiras --namespace kinitiras-system --create-namespace
 
 To uninstall the chart:
 
