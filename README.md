@@ -21,5 +21,5 @@ To install the <chart-name> chart:
 
 To uninstall the chart:
 
-    helm delete my-kinitiras
+    helm delete kinitiras-webhook --namespace kinitiras-system
 
